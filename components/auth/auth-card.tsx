@@ -20,7 +20,7 @@ const AuthCard = ({
 }: Props) => {
   return (
     <Card>
-      <CardHeader>{cardTitle}</CardHeader>
+      <CardHeader className="text-center">{cardTitle}</CardHeader>
       <CardContent>{children}</CardContent>
       {showSocials && (
         <CardFooter>

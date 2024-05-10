@@ -1,60 +1,83 @@
 "use client";
 
-import EmailSignIn from "@/server/actions/email-signin";
-import * as z from "zod";
+import { cn } from "@/lib/utils";
+import RegisterSchema from "@/types/register-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "../ui/button";
 import {
   Form,
-  FormField,
-  FormLabel,
   FormControl,
-  FormItem,
   FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
   FormMessage,
 } from "../ui/form";
-import AuthCard from "./auth-card";
-import LoginSchema from "@/types/login-schema";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import Link from "next/link";
-import { useAction } from "next-safe-action/hooks";
-import { cn } from "@/lib/utils";
+import AuthCard from "./auth-card";
 import { useState } from "react";
+import FormSuccess from "./form-success";
+import FormError from "./form-error";
+import EmailRegister from "@/server/actions/email-register";
 
-const LoginForm = () => {
+const RegisterForm = () => {
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const { execute, status } = useAction(EmailRegister, {
+    onSuccess(data) {
+      if (data?.error) return setError(data.error);
+      if (data?.success) return setSuccess(data.success);
+    },
+  });
+
+  const onSubmitForm = (value: z.infer<typeof RegisterSchema>) => {
+    // console.log(value);
+    execute(value);
+  };
 
   const form = useForm({
-    resolver: zodResolver(LoginSchema),
+    resolver: zodResolver(RegisterSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
   });
 
-  const { execute, status } = useAction(EmailSignIn, {
-    onSuccess(data) {
-      console.log(data);
-    },
-  });
-
-  const onSubmitForm = (value: z.infer<typeof LoginSchema>) => {
-    // console.log(value);
-    execute(value);
-  };
   return (
     <div>
       <AuthCard
         showSocials
-        cardTitle={"Welcome Back!"}
-        backButtonHref={"/auth/register"}
-        backButtonlabel={"Create a New Accout"}
+        cardTitle={"Create an Account"}
+        backButtonHref={"/auth/login"}
+        backButtonlabel={"Already have an Account? Login here"}
       >
         <div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmitForm)}>
+              {/* Inputs div */}
               <div>
+                {/* Name field */}
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="abc" type="text" />
+                      </FormControl>
+                      <FormDescription />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Email field */}
                 <FormField
                   control={form.control}
                   name="email"
@@ -74,6 +97,8 @@ const LoginForm = () => {
                     </FormItem>
                   )}
                 />
+
+                {/* Password field */}
                 <FormField
                   control={form.control}
                   name="password"
@@ -88,9 +113,12 @@ const LoginForm = () => {
                     </FormItem>
                   )}
                 />
-                <Button asChild variant={"link"} size={"sm"}>
-                  <Link href={"/auth/reset"}>Forget Password?</Link>
-                </Button>
+
+                {/* Message after submiting form*/}
+                <FormSuccess message={success} />
+                <FormError message={error} />
+                {/* Message after submiting form */}
+
                 <Button
                   className={cn(
                     "w-full my-2",
@@ -98,7 +126,7 @@ const LoginForm = () => {
                   )}
                   type="submit"
                 >
-                  {"Login"}
+                  Register
                 </Button>
               </div>
             </form>
@@ -109,4 +137,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default RegisterForm;
