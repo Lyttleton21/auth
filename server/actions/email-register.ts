@@ -5,8 +5,8 @@ import RegisterSchema from '@/types/register-schema'
 import {createSafeActionClient} from 'next-safe-action'
 import bcrypt from 'bcrypt'
 
-import generateEmailVerificationToken from './token'
 import SendVerificationEmail from './email'
+import { generateEmailVerificationToken } from './token'
 
 const prisma = new PrismaClient()
 const action = createSafeActionClient();
