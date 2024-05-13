@@ -103,4 +103,56 @@ export const newVerification = async (token:string) => {
     }
 }
 
+export const getPasswordResetTokenByToken = async (token: string) => {
+    try {
+        const passwordResetToken = await prisma.passwordResetToken.findFirst({
+            where: {
+                token: token
+            }
+        });
+        return passwordResetToken;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+export const getPasswordResetTokenByEmail = async(email: string) => {
+    try {
+        const passwordResetToken = await prisma.passwordResetToken.findFirst({
+            where: {email}
+        });
+        return passwordResetToken;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+export const generatePasswordResetToken = async(email: string) => {
+    try {
+        const token = crypto.randomUUID();
+        const expires = new Date(new Date().getTime() + 3600 * 1000);
+
+        const existingToken = await getPasswordResetTokenByEmail(email); 
+        if(existingToken) {
+            await prisma.passwordResetToken.delete({
+                where: {
+                    id: existingToken.id
+                }
+            });
+        }
+        const passwordResetToken = await prisma.passwordResetToken.create({
+            data: {
+                email,
+                token,
+                expires
+            }
+        });
+        return passwordResetToken;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 

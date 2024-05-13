@@ -55,6 +55,16 @@ model Email_Token {
   email      String
 }
 
-model fake {
-  id String @id @default(cuid())
+model passwordResetToken {
+  id      String   @id @default(cuid())
+  token   String
+  expires DateTime
+  email   String
+}
+
+model twoFactorTokens {
+  id      String   @id @default(cuid())
+  token   String
+  expires DateTime
+  email   String
 }
