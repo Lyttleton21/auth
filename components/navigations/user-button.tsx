@@ -10,13 +10,29 @@ import {
 import { LogOut, Moon, Settings, Sun, TruckIcon } from "lucide-react";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
+import { useState } from "react";
+import { Switch } from "../ui/switch";
 
 interface Props {
   user: Session | null;
 }
 
 const UserButton = ({ user }: Session) => {
+  const { setTheme, theme } = useTheme();
+  const [checked, setChecked] = useState(false);
+
+  function setSwitchState() {
+    switch (theme) {
+      case "dark":
+        return setChecked(true);
+      case "light":
+        return setChecked(false);
+      case "system":
+        return setChecked(false);
+    }
+  }
   if (user)
     return (
       <DropdownMenu modal={false}>
@@ -67,12 +83,33 @@ const UserButton = ({ user }: Session) => {
             <Settings size={14} className="mr-1" /> Settings
           </DropdownMenuItem>
           <DropdownMenuItem className="py-2 font-medium cursor-pointer transition-all duration-500">
-            <div className="flex items-center">
-              <Sun size={14} className="mr-1" />
-              <Moon size={14} className="mr-1" />
-              <p>
-                Theme: <span>theme</span>
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center group"
+            >
+              <div className="relative flex mr-2">
+                <Sun
+                  size={14}
+                  className=" absolute group-hover:text-yellow-600 dark:scale-0"
+                />
+                <Moon
+                  size={14}
+                  className=" group-hover:text-blue-400 dark:scale-100 scale-0"
+                />
+              </div>
+
+              <p className="dark:text-blue-400 text-secondary-foreground/75 text-yellow-600 ">
+                {theme!} Mode
               </p>
+              <Switch
+                className="scale-75 ml-3"
+                checked={checked}
+                onCheckedChange={(e) => {
+                  setChecked((prev) => !prev);
+                  // console.log(e);
+                  e === true ? setTheme("dark") : setTheme("light");
+                }}
+              />
             </div>
           </DropdownMenuItem>
           <DropdownMenuItem
