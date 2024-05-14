@@ -5,7 +5,7 @@ import NewPassword from "@/server/actions/new-password";
 import NewPasswordSchema from "@/types/new-password-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
-import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -23,11 +23,11 @@ import { Input } from "../ui/input";
 import AuthCard from "./auth-card";
 import FormError from "./form-error";
 import FormSuccess from "./form-success";
-import { useSearchParams } from "next/navigation";
 
 const NewPasswordForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof NewPasswordSchema>>({
     resolver: zodResolver(NewPasswordSchema),
@@ -41,7 +41,10 @@ const NewPasswordForm = () => {
   const { execute, status } = useAction(NewPassword, {
     onSuccess(data) {
       if (data?.error) setError(data.error);
-      if (data?.success) setSuccess(data.success);
+      if (data?.success) {
+        setSuccess(data.success);
+        router.push("/auth/login");
+      }
     },
   });
 
@@ -52,7 +55,6 @@ const NewPasswordForm = () => {
   return (
     <div>
       <AuthCard
-        showSocials
         cardTitle={"Enter a New Password"}
         backButtonHref={"/auth/login"}
         backButtonlabel={"Back to Login"}
@@ -82,9 +84,9 @@ const NewPasswordForm = () => {
                 />
                 <FormSuccess message={success} />
                 <FormError message={error} />
-                <Button asChild variant={"link"} size={"sm"}>
+                {/* <Button asChild variant={"link"} size={"sm"}>
                   <Link href={"/auth/reset"}>Forget Password?</Link>
-                </Button>
+                </Button> */}
                 <Button
                   className={cn(
                     "w-full my-2",

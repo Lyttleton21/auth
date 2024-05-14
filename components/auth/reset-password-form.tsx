@@ -1,11 +1,10 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import NewPassword from "@/server/actions/new-password";
-import NewPasswordSchema from "@/types/new-password-schema";
+import PasswordReset from "@/server/actions/password-reset";
+import ResetPasswordSchema from "@/types/reset-password-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
-import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -23,12 +22,12 @@ import { Input } from "../ui/input";
 import AuthCard from "./auth-card";
 import FormError from "./form-error";
 import FormSuccess from "./form-success";
-import ResetPasswordSchema from "@/types/reset-password-schema";
-import PasswordReset from "@/server/actions/password-reset";
+import { useRouter } from "next/navigation";
 
 const ResetPasswordForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof ResetPasswordSchema>>({
     resolver: zodResolver(ResetPasswordSchema),
@@ -40,7 +39,9 @@ const ResetPasswordForm = () => {
   const { execute, status } = useAction(PasswordReset, {
     onSuccess(data) {
       if (data?.error) setError(data.error);
-      if (data?.success) setSuccess(data.success);
+      if (data?.success) {
+        setSuccess(data.success);
+      }
     },
   });
 
@@ -51,7 +52,6 @@ const ResetPasswordForm = () => {
   return (
     <div>
       <AuthCard
-        showSocials
         cardTitle={"Forget your Password"}
         backButtonHref={"/auth/login"}
         backButtonlabel={"Back to Login"}
@@ -82,9 +82,9 @@ const ResetPasswordForm = () => {
                 />
                 <FormSuccess message={success} />
                 <FormError message={error} />
-                <Button asChild variant={"link"} size={"sm"}>
+                {/* <Button asChild variant={"link"} size={"sm"}>
                   <Link href={"/auth/reset"}>Forget Password?</Link>
-                </Button>
+                </Button> */}
                 <Button
                   className={cn(
                     "w-full my-2",
