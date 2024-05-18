@@ -14,6 +14,7 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useState } from "react";
 import { Switch } from "../ui/switch";
+import { useRouter } from "next/navigation";
 
 interface Props {
   user: Session | null;
@@ -22,6 +23,7 @@ interface Props {
 const UserButton = ({ user }: Session) => {
   const { setTheme, theme } = useTheme();
   const [checked, setChecked] = useState(false);
+  const router = useRouter();
 
   function setSwitchState() {
     switch (theme) {
@@ -75,11 +77,17 @@ const UserButton = ({ user }: Session) => {
             </span>
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="py-2 font-medium cursor-pointer transition-all duration-500">
+          <DropdownMenuItem
+            onClick={() => router.push("/dashboard/order")}
+            className="py-2 font-medium cursor-pointer transition-all duration-500"
+          >
             <TruckIcon size={14} className="mr-1" />
             My Orders
           </DropdownMenuItem>
-          <DropdownMenuItem className="py-2 font-medium cursor-pointer transition-all duration-500">
+          <DropdownMenuItem
+            onClick={() => router.push("/dashboard/settings")}
+            className="py-2 font-medium cursor-pointer transition-all duration-500"
+          >
             <Settings size={14} className="mr-1" /> Settings
           </DropdownMenuItem>
           <DropdownMenuItem className="py-2 font-medium cursor-pointer transition-all duration-500">
